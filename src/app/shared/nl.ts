@@ -145,10 +145,18 @@ export const T = {
 
   tour: {
     title: 'Rondleiding',
-    intro: 'Zo ziet Biebouders eruit als je bent ingelogd: vijf schermen, één balk bovenin, en de instellingen achter het tandwiel. Op een telefoon staan dezelfde knoppen, alleen wat dichter op elkaar.',
+    intro: 'Zo ziet Biebouders eruit: eerst een account, daarna vijf schermen met één balk bovenin, en de instellingen achter het tandwiel. Op een telefoon staan dezelfde knoppen, alleen wat dichter op elkaar.',
     disclaimer:
       'De school, de namen en de boeken op deze schermafbeeldingen zijn verzonnen. Het zijn voorbeeldgegevens, geen echte leerlingen.',
     screens: [
+      {
+        id: 'account',
+        icon: 'person_add',
+        title: 'Account aanmaken',
+        image: '/assets/images/demo/account.png',
+        alt: 'Het scherm Account aanmaken met een veld voor e-mailadres en wachtwoord en de knop Doorgaan met Google.',
+        text: 'Log in met je Google-account, of maak een eigen account aan met alleen een e-mailadres en wachtwoord. Daarna maak je een nieuwe schoolbieb aan, of sluit je met een toegangscode aan bij een school die al meedoet.',
+      },
       {
         id: 'lenen',
         icon: 'import_contacts',
