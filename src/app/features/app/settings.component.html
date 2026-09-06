@@ -87,4 +87,20 @@
   }
 
   <button mat-button type="button" class="self-start" (click)="logout()"><mat-icon>logout</mat-icon>{{ t.settings.logout }}</button>
+
+  <section class="card flex flex-col gap-4 border-red-200!">
+    <h2 class="m-0 text-lg font-semibold text-red-800">{{ t.danger.title }}</h2>
+    @if (school.isAdmin()) {
+      <div class="flex flex-col gap-2">
+        <h3 class="m-0 font-medium">{{ t.danger.schoolTitle }}</h3>
+        <p class="m-0 text-sm text-slate-600">{{ t.danger.schoolText(school.school()?.name ?? '') }}</p>
+        <button mat-stroked-button type="button" class="self-start text-red-700!" (click)="deleteSchool()" [disabled]="busy()"><mat-icon>delete_forever</mat-icon>{{ t.danger.schoolButton }}</button>
+      </div>
+    }
+    <div class="flex flex-col gap-2">
+      <h3 class="m-0 font-medium">{{ t.danger.accountTitle }}</h3>
+      <p class="m-0 text-sm text-slate-600">{{ t.danger.accountText }}</p>
+      <button mat-stroked-button type="button" class="self-start text-red-700!" (click)="deleteAccount()" [disabled]="busy()"><mat-icon>person_remove</mat-icon>{{ t.danger.accountButton }}</button>
+    </div>
+  </section>
 </div>

@@ -224,6 +224,7 @@ export const T = {
       weakPassword: 'Kies een wachtwoord van minimaal 8 tekens.',
       invalidEmail: 'Dit is geen geldig e-mailadres.',
       popupClosed: 'Het Google-venster is gesloten voordat je was ingelogd.',
+      recentLogin: 'Log om veiligheidsredenen opnieuw in en probeer het daarna meteen opnieuw.',
       generic: 'Inloggen is niet gelukt. Probeer het opnieuw.',
     },
   },
@@ -408,6 +409,28 @@ export const T = {
       `Hallo,\n\nWij willen graag een Schoolbieb-abonnement voor ${school} (${count} boeken).\n\nMet vriendelijke groet,`,
     lockedTitle: 'Alleen-lezen',
     lockedText: 'Deze actie is niet beschikbaar zolang het abonnement niet is geregeld. Bekijken en inleveren kan wel.',
+  },
+
+  /** Instellingen → Verwijderen: the irreversible actions. */
+  danger: {
+    title: 'Verwijderen',
+    schoolTitle: 'School verwijderen',
+    schoolText: (name: string) =>
+      `Verwijdert ${name} met alle boeken, leerlingen, uitleningen en medewerkers. Dit kan niet ongedaan worden gemaakt. Exporteer eerst je gegevens als je ze wilt bewaren.`,
+    schoolButton: 'School verwijderen',
+    schoolConfirm: (name: string) => `Typ de naam van de school (${name}) om te bevestigen.`,
+    schoolDone: 'De school is verwijderd.',
+    accountTitle: 'Account verwijderen',
+    accountText:
+      'Verwijdert je inlogaccount. Ben je het enige lid van een school, dan wordt die school met alle gegevens ook verwijderd. Bij andere scholen word je alleen als medewerker verwijderd.',
+    accountButton: 'Account verwijderen',
+    accountConfirm: 'Weet je zeker dat je je account wilt verwijderen? Dit kan niet ongedaan worden gemaakt.',
+    accountPassword: 'Vul ter bevestiging je wachtwoord in.',
+    accountDone: 'Je account is verwijderd.',
+    adminWithMembers: (name: string) =>
+      `Je bent beheerder van ${name} en er zijn nog andere medewerkers. Verwijder eerst de school, of vraag de medewerkers om hun account te verwijderen.`,
+    typeToConfirm: 'Naam van de school',
+    mismatch: 'De naam klopt niet.',
   },
 
   export: {

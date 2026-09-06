@@ -1,9 +1,13 @@
 import { Injectable, NgZone, computed, inject, signal } from '@angular/core';
 import {
+  EmailAuthProvider,
   GoogleAuthProvider,
   User,
   createUserWithEmailAndPassword,
+  deleteUser,
   onAuthStateChanged,
+  reauthenticateWithCredential,
+  reauthenticateWithPopup,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -20,6 +24,8 @@ export class AuthService {
   readonly user = signal<User | null | undefined>(undefined);
   readonly ready = computed(() => this.user() !== undefined);
   readonly uid = computed(() => this.user()?.uid ?? null);
+  /** True when the user signs in with e-mail and password (rather than Google). */
+  readonly usesPassword = computed(() => this.user()?.providerData.some((p) => p.providerId === 'password') ?? false);
 
   constructor() {
     onAuthStateChanged(this.auth, (user) => this.zone.run(() => this.user.set(user)));
@@ -56,5 +62,27 @@ export class AuthService {
 
   logout(): Promise<void> {
     return signOut(this.auth);
+  }
+
+  /**
+   * Firebase refuses to delete a user whose sign-in is older than a few
+   * minutes, so prove it is really them first: with the password, or with a
+   * Google popup for Google accounts.
+   */
+  async reauthenticate(password?: string): Promise<void> {
+    const user = this.auth.currentUser;
+    if (!user) throw new Error('Not signed in');
+    if (this.usesPassword()) {
+      await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email ?? '', password ?? ''));
+    } else {
+      await reauthenticateWithPopup(user, new GoogleAuthProvider());
+    }
+  }
+
+  /** Deletes the Firebase Auth user; this also signs them out. Call `reauthenticate` first. */
+  async deleteAccount(): Promise<void> {
+    const user = this.auth.currentUser;
+    if (!user) throw new Error('Not signed in');
+    await deleteUser(user);
   }
 }

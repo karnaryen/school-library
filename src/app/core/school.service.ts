@@ -3,9 +3,12 @@ import {
   CollectionReference,
   DocumentReference,
   Firestore,
+  arrayRemove,
   collection,
+  deleteDoc,
   doc,
   getDoc,
+  getDocs,
   runTransaction,
   updateDoc,
   writeBatch,
@@ -15,7 +18,7 @@ import { makeInternalCode } from '../shared/isbn';
 import { JoinCode, Member, School, UserProfile, addDays, now, today } from '../shared/models';
 import { MONETIZATION_ENABLED, PlanInfo, TRIAL_DAYS, planInfo } from '../shared/plan';
 import { AuthService } from './auth.service';
-import { documentChanges } from './firestore.util';
+import { chunk, documentChanges } from './firestore.util';
 
 export class JoinError extends Error {
   constructor(readonly code: 'unknown-code' | 'already-member') {
@@ -23,6 +26,17 @@ export class JoinError extends Error {
     this.name = 'JoinError';
   }
 }
+
+/** Account deletion refused: the user is the beheerder of a school that still has other members. */
+export class AccountError extends Error {
+  constructor(readonly schoolName: string) {
+    super('admin-with-members');
+    this.name = 'AccountError';
+  }
+}
+
+/** Everything under a school document, in the order it is wiped. */
+const SCHOOL_COLLECTIONS = ['loans', 'copies', 'titles', 'students'] as const;
 
 const DEFAULT_GROUPS = ['1', '2', '3', '4', '5', '6', '7', '8'];
 const DEFAULT_LOAN_DAYS = 21;
@@ -131,6 +145,62 @@ export class SchoolService {
     return updateDoc(doc(this.db, 'schools', id), patch);
   }
 
+  /**
+   * Deletes the current school with everything in it (beheerder only). Other
+   * members lose access immediately; their profiles are cleaned up the next
+   * time they sign in (see `follow`).
+   */
+  async deleteSchool(): Promise<void> {
+    const user = this.requireUser();
+    const school = this.school();
+    if (!school) throw new Error('No school selected');
+
+    this.stopFollowing();
+    this.school.set(undefined);
+    try {
+      await this.wipeSchool(school.id, school.joinCode);
+      await updateDoc(this.profileRef(user.uid), { schoolIds: arrayRemove(school.id) });
+    } finally {
+      await this.follow(user.uid);
+    }
+  }
+
+  /**
+   * Removes the user from every school (deleting schools where they are the
+   * only member), deletes their profile and finally their sign-in account.
+   * The caller must have re-authenticated first, so the last step cannot fail
+   * after data is already gone.
+   */
+  async deleteAccount(): Promise<void> {
+    const user = this.requireUser();
+    const profileSnap = await getDoc(this.profileRef(user.uid));
+    const schoolIds = profileSnap.exists() ? (profileSnap.data() as UserProfile).schoolIds : [];
+
+    // Check every school before touching anything, so a refusal leaves no half-deleted state.
+    const plans: { id: string; joinCode: string; wipe: boolean }[] = [];
+    for (const id of schoolIds) {
+      const memberSnap = await getDoc(doc(this.db, 'schools', id, 'members', user.uid));
+      if (!memberSnap.exists()) continue;
+      const schoolSnap = await getDoc(doc(this.db, 'schools', id));
+      const members = await getDocs(collection(this.db, 'schools', id, 'members'));
+      const others = members.docs.filter((m) => m.id !== user.uid);
+      const otherAdmin = others.some((m) => (m.data() as Member).role === 'beheerder');
+      if (others.length > 0 && (memberSnap.data() as Member).role === 'beheerder' && !otherAdmin) {
+        throw new AccountError((schoolSnap.data() as School | undefined)?.name ?? '');
+      }
+      plans.push({ id, joinCode: (schoolSnap.data() as School | undefined)?.joinCode ?? '', wipe: others.length === 0 });
+    }
+
+    this.stopFollowing();
+    this.school.set(undefined);
+    for (const plan of plans) {
+      if (plan.wipe) await this.wipeSchool(plan.id, plan.joinCode);
+      else await deleteDoc(doc(this.db, 'schools', plan.id, 'members', user.uid));
+    }
+    await deleteDoc(this.profileRef(user.uid));
+    await this.auth.deleteAccount();
+  }
+
   /** Reserves the next school-internal barcode for a book without an ISBN. */
   async allocateInternalCode(): Promise<string> {
     const ref = doc(this.db, 'schools', this.requireSchoolId());
@@ -171,11 +241,43 @@ export class SchoolService {
     return { uid, email: email ?? '', schoolIds: [...existing, schoolId], createdAt: now() };
   }
 
-  /** (Re)subscribes to the user's first school and their membership in it. */
-  private async follow(uid: string | null): Promise<void> {
+  /**
+   * Deletes a school and all of its data. The order matters: the school
+   * document goes first, because that is the write the security rules may
+   * refuse, and then nothing else has been touched yet. Members keep their
+   * member documents until the very end so they are still allowed to delete
+   * the subcollections.
+   */
+  private async wipeSchool(schoolId: string, joinCode: string): Promise<void> {
+    const schoolRef = doc(this.db, 'schools', schoolId);
+    const batch = writeBatch(this.db);
+    batch.delete(schoolRef);
+    if (joinCode) batch.delete(doc(this.db, 'joinCodes', joinCode));
+    await batch.commit();
+    for (const name of SCHOOL_COLLECTIONS) {
+      await this.deleteCollection(collection(schoolRef, name));
+    }
+    await this.deleteCollection(collection(schoolRef, 'members'));
+  }
+
+  private async deleteCollection(ref: CollectionReference): Promise<void> {
+    const snap = await getDocs(ref);
+    for (const part of chunk(snap.docs)) {
+      const batch = writeBatch(this.db);
+      part.forEach((d) => batch.delete(d.ref));
+      await batch.commit();
+    }
+  }
+
+  private stopFollowing(): void {
     this.subscriptions.forEach((s) => s.unsubscribe());
     this.subscriptions = [];
     this.member.set(null);
+  }
+
+  /** (Re)subscribes to the user's first school and their membership in it. */
+  private async follow(uid: string | null): Promise<void> {
+    this.stopFollowing();
 
     if (!uid) {
       this.school.set(this.auth.ready() ? null : undefined);
@@ -190,13 +292,22 @@ export class SchoolService {
       return;
     }
 
+    // A school that was deleted (by its beheerder) is no longer readable: drop
+    // it from the profile and continue as a user without a school.
+    const gone = async () => {
+      this.stopFollowing();
+      this.school.set(null);
+      await updateDoc(this.profileRef(uid), { schoolIds: arrayRemove(schoolId) }).catch(() => undefined);
+    };
     this.subscriptions.push(
-      documentChanges<School>(this.zone, doc(this.db, 'schools', schoolId)).subscribe((school) =>
-        this.school.set(school),
-      ),
-      documentChanges<Member>(this.zone, doc(this.db, 'schools', schoolId, 'members', uid), 'uid').subscribe(
-        (member) => this.member.set(member),
-      ),
+      documentChanges<School>(this.zone, doc(this.db, 'schools', schoolId)).subscribe({
+        next: (school) => (school ? this.school.set(school) : gone()),
+        error: gone,
+      }),
+      documentChanges<Member>(this.zone, doc(this.db, 'schools', schoolId, 'members', uid), 'uid').subscribe({
+        next: (member) => this.member.set(member),
+        error: () => this.member.set(null),
+      }),
     );
   }
 }

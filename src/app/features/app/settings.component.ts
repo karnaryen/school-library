@@ -10,11 +10,13 @@ import { Router } from '@angular/router';
 import { firstValueFrom, of, switchMap } from 'rxjs';
 import { AuthService } from '../../core/auth.service';
 import { collectionChanges } from '../../core/firestore.util';
-import { SchoolService } from '../../core/school.service';
+import { AccountError, SchoolService } from '../../core/school.service';
 import { LibraryService } from '../../services/library.service';
 import { SnackBarService } from '../../services/snack-bar.service';
 import { StudentsService } from '../../services/students.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/confirm-dialog/confirm-dialog.component';
+import { DangerDialogComponent, DangerDialogData, DangerDialogResult } from '../../shared/danger-dialog/danger-dialog.component';
+import { describeAuthError } from '../public/auth-errors';
 import { downloadCsv, toCsv } from '../../shared/export';
 import { Member, studentDisplayName, today } from '../../shared/models';
 import { T, formatDate } from '../../shared/nl';
@@ -172,6 +174,55 @@ export class SettingsComponent {
       ]);
       downloadCsv(`biebouders-uitleningen-${today()}.csv`, csv);
     });
+  }
+
+  /** Beheerder only: wipes the school and everything in it. */
+  protected async deleteSchool(): Promise<void> {
+    const school = this.school.school();
+    if (!school) return;
+    const data: DangerDialogData = {
+      title: T.danger.schoolTitle,
+      message: T.danger.schoolConfirm(school.name),
+      challenge: school.name,
+      challengeLabel: T.danger.typeToConfirm,
+      confirmLabel: T.danger.schoolButton,
+    };
+    if (!(await this.openDanger(data))) return;
+    await this.run(async () => {
+      await this.school.deleteSchool();
+      this.snackBar.success(T.danger.schoolDone);
+      await this.router.navigateByUrl('/app');
+    });
+  }
+
+  /** Removes the user from their schools (deleting schools where they are alone) and deletes the sign-in account. */
+  protected async deleteAccount(): Promise<void> {
+    const data: DangerDialogData = {
+      title: T.danger.accountTitle,
+      message: T.danger.accountConfirm,
+      passwordLabel: this.auth.usesPassword() ? T.auth.password : undefined,
+      confirmLabel: T.danger.accountButton,
+    };
+    const result = await this.openDanger(data);
+    if (!result) return;
+    this.busy.set(true);
+    try {
+      // Prove identity first: a stale sign-in would otherwise fail only after the data is gone.
+      await this.auth.reauthenticate(result.password);
+      await this.school.deleteAccount();
+      this.snackBar.success(T.danger.accountDone);
+      await this.router.navigateByUrl('/');
+    } catch (err) {
+      if (err instanceof AccountError) this.snackBar.error(T.danger.adminWithMembers(err.schoolName));
+      else this.snackBar.error(describeAuthError(err));
+    } finally {
+      this.busy.set(false);
+    }
+  }
+
+  private openDanger(data: DangerDialogData): Promise<DangerDialogResult | undefined> {
+    const ref = this.dialog.open<DangerDialogComponent, DangerDialogData, DangerDialogResult>(DangerDialogComponent, { data, width: '28rem' });
+    return firstValueFrom(ref.afterClosed());
   }
 
   protected async logout(): Promise<void> {

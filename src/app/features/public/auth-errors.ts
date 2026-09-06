@@ -16,6 +16,8 @@ export function describeAuthError(err: unknown): string {
       return e.weakPassword;
     case 'auth/invalid-email':
       return e.invalidEmail;
+    case 'auth/requires-recent-login':
+      return e.recentLogin;
     case 'auth/popup-closed-by-user':
     case 'auth/cancelled-popup-request':
       return e.popupClosed;

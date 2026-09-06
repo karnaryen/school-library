@@ -74,6 +74,23 @@ The security rules stop the app from changing `plan`, `trialEndsAt` and
 `paidUntil`. The read-only state is enforced in the UI only (see
 `src/app/shared/plan.ts`), which is fine for a paying-customer relationship.
 
+## Deleting a school or an account
+
+Instellingen → Verwijderen. A beheerder can delete the whole school
+(`SchoolService.deleteSchool`): the school document and join code go first
+(the write the rules may refuse), then all subcollections are wiped
+client-side in batches, and the member documents last.
+Anyone can delete their account (`SchoolService.deleteAccount`): the user is
+removed from every school, schools where they were the only member are wiped,
+the profile is deleted and finally the Firebase Auth user. Firebase requires a
+recent sign-in for that last step, so the app re-authenticates first (password
+or Google popup). A beheerder with other members still in the school is
+refused until the school is deleted.
+
+The security rules allow `delete` on `schools/{sid}` for a beheerder and on a
+member's own document; redeploy them after pulling this change:
+`firebase deploy --only firestore:rules`.
+
 ## Books without a barcode
 
 Boek toevoegen → "Geen barcode?" reserves a school-internal EAN-13 code

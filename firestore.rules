@@ -54,7 +54,9 @@ service cloud.firestore {
       allow update: if
         (isAdmin(sid) && onlyChanges(['name', 'loanDays', 'groups', 'copyCount', 'nextInternalCode']))
         || (isMember(sid) && onlyChanges(['copyCount', 'nextInternalCode']));
-      allow delete: if false;
+      // A beheerder may delete the whole school (Instellingen → Verwijderen);
+      // the app wipes the subcollections first.
+      allow delete: if isAdmin(sid);
 
       match /members/{uid} {
         allow read: if isMember(sid);
@@ -68,7 +70,9 @@ service cloud.firestore {
           (request.resource.data.role == 'medewerker'
             && request.resource.data.joinCode == get(/databases/$(db)/documents/schools/$(sid)).data.joinCode)
         );
-        allow update, delete: if isAdmin(sid) && uid != request.auth.uid;
+        allow update: if isAdmin(sid) && uid != request.auth.uid;
+        // A beheerder removes colleagues; anyone may remove themself (account deletion).
+        allow delete: if isAdmin(sid) || (signedIn() && request.auth.uid == uid);
       }
 
       match /students/{id} {
