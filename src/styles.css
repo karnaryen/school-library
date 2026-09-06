@@ -21,6 +21,14 @@ body {
   background-color: white !important;
 }
 
+/* Icon buttons: Material lays the icon out inline on the text baseline, which lands it 2px below the centre of the
+   hover circle. Centre it with flexbox instead. */
+.mat-mdc-icon-button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Secondary buttons also sit on the striped page background; keep them solid so the pattern does not show through. */
 .mat-mdc-outlined-button {
   background-color: white !important;
