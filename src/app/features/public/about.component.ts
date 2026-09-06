@@ -5,11 +5,11 @@ import { T } from '../../shared/nl';
 import { PublicLayoutComponent } from './public-layout.component';
 
 @Component({
-  selector: 'app-landing',
+  selector: 'app-about',
   imports: [RouterLink, MatIconModule, PublicLayoutComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './landing.component.html',
+  templateUrl: './about.component.html',
 })
-export class LandingComponent {
+export class AboutComponent {
   protected readonly t = T;
 }

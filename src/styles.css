@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* Brand colours. Use these instead of raw hex values in templates. */
+@theme {
+  --color-ink: #14305c;
+  --color-brand: #1f4e9c;
+  --color-brand-dark: #173d7c;
+  --color-canvas: #f4f7fb;
+  --color-sun: #f5b942;
+}
+
 html, body { height: 100%; }
 body {
   margin: 0;
@@ -66,6 +75,52 @@ body {
 }
 .plan-banner.trial { @apply bg-amber-50 text-amber-900 border-b border-amber-200; }
 .plan-banner.locked { @apply bg-red-50 text-red-900 border-b border-red-200; }
+
+/* Public pages (landing, rondleiding, over, privacy). In the components layer so plain utilities can still override them. */
+@layer components {
+.page-width {
+  @apply max-w-6xl w-full mx-auto px-5;
+}
+.public-section {
+  @apply max-w-6xl w-full mx-auto px-5 py-14 md:py-20;
+}
+.eyebrow {
+  @apply m-0 text-xs font-semibold tracking-widest uppercase text-brand;
+}
+.section-title {
+  @apply m-0 text-3xl md:text-4xl font-bold leading-tight text-balance;
+}
+.section-lead {
+  @apply m-0 text-lg text-slate-600 max-w-prose;
+}
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-brand text-white text-lg font-medium no-underline
+    shadow-sm hover:bg-brand-dark transition-colors;
+}
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border-2 border-brand bg-white text-brand text-lg font-medium
+    no-underline hover:bg-blue-50 transition-colors;
+}
+.public-link {
+  @apply px-3 py-2 rounded-full font-medium text-ink no-underline hover:bg-blue-50 hover:text-brand;
+}
+.public-link.active {
+  @apply text-brand;
+}
+.feature-card {
+  @apply bg-white rounded-2xl border border-slate-200 p-6 flex flex-col gap-3 shadow-sm;
+}
+.feature-icon {
+  @apply inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 text-brand;
+}
+/* Framed screenshot on the rondleiding, styled like a school tablet. */
+.screen-frame {
+  @apply rounded-[1.75rem] border-[10px] border-slate-800 bg-slate-800 shadow-xl overflow-hidden;
+}
+.screen-frame img {
+  @apply block w-full h-auto rounded-[1.1rem];
+}
+}
 
 @media print {
   header, nav, .no-print { display: none !important; }

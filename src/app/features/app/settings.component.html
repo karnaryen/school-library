@@ -1,17 +1,20 @@
 <div class="screen">
   <h1 class="screen-title">{{ t.settings.title }}</h1>
 
-  <section class="card flex flex-col gap-2" [class.border-red-200!]="school.locked()">
-    <div class="flex items-baseline justify-between gap-2">
-      <h2 class="m-0 text-lg font-semibold">{{ t.plan.title }}</h2>
-      <span class="text-xs px-2 py-1 rounded-full" [class.bg-blue-50]="!school.locked()" [class.text-blue-900]="!school.locked()" [class.bg-red-50]="school.locked()" [class.text-red-900]="school.locked()">{{ planName() }}</span>
-    </div>
-    <p class="m-0 text-slate-700">{{ planText() }}</p>
-    @if (school.plan()?.status !== 'paid') {
-      <p class="m-0 text-sm text-slate-500">{{ t.plan.price }}</p>
-      <a mat-flat-button [href]="requestHref()" class="self-start"><mat-icon>mail</mat-icon>{{ t.plan.request }}</a>
-    }
-  </section>
+  <!-- Abonnement: only rendered once MONETIZATION_ENABLED (shared/plan.ts) is on. Kept for future monetisation. -->
+  @if (school.plan(); as plan) {
+    <section class="card flex flex-col gap-2" [class.border-red-200!]="plan.locked">
+      <div class="flex items-baseline justify-between gap-2">
+        <h2 class="m-0 text-lg font-semibold">{{ t.plan.title }}</h2>
+        <span class="text-xs px-2 py-1 rounded-full" [class.bg-blue-50]="!plan.locked" [class.text-blue-900]="!plan.locked" [class.bg-red-50]="plan.locked" [class.text-red-900]="plan.locked">{{ planName() }}</span>
+      </div>
+      <p class="m-0 text-slate-700">{{ planText() }}</p>
+      @if (plan.status !== 'paid') {
+        <p class="m-0 text-sm text-slate-500">{{ t.plan.price }}</p>
+        <a mat-flat-button [href]="requestHref()" class="self-start"><mat-icon>mail</mat-icon>{{ t.plan.request }}</a>
+      }
+    </section>
+  }
 
   @if (school.isAdmin()) {
     <form class="card flex flex-col gap-2" [formGroup]="form" (ngSubmit)="save()">

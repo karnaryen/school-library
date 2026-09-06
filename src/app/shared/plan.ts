@@ -1,5 +1,13 @@
 import { School } from './models';
 
+/**
+ * Future monetisation. While false the app never shows the Abonnement section,
+ * the trial banner or the read-only state; the school document still carries
+ * plan/trialEndsAt/paidUntil (the security rules require them), so flipping this
+ * back on needs no data migration.
+ */
+export const MONETIZATION_ENABLED = false;
+
 /** A klassenbieb up to this many copies stays free forever. */
 export const FREE_TIER_COPIES = 150;
 /** Every new school gets the full product for this long. */

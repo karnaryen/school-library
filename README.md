@@ -53,6 +53,12 @@ The same three steps run in GitHub Actions on every push and pull request.
 
 ## Subscriptions
 
+Monetisation is switched off for now: `MONETIZATION_ENABLED` in
+`src/app/shared/plan.ts` is `false`, so the Abonnement section, the trial
+banner and the read-only state are never shown. The data model and the
+security rules below are unchanged, so it can be switched back on without a
+migration.
+
 There is no payment flow. A school starts with a 90-day trial of the full
 product; afterwards it stays free while it has at most 150 copies, and becomes
 read-only above that until it pays. The school asks for an invoice from
@@ -81,7 +87,7 @@ src/app/
   core/         AuthService, SchoolService (current tenant), auth guard, Firestore helpers
   services/     StudentsService, LibraryService (titles, copies, loans), IsbnLookupService
   features/
-    public/     landing, login, register, privacy
+    public/     landing, rondleiding, over, privacy, login, register (shared PublicLayoutComponent)
     app/        shell + onboarding, uitlenen, innemen, overzicht, boeken (+ nieuw, etiketten),
                 leerlingen, instellingen (abonnement, export, team, nieuw schooljaar)
   shared/       models, ISBN helpers, CSV parser, Dutch UI strings (nl.ts),

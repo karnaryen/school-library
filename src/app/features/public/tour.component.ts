@@ -4,12 +4,13 @@ import { RouterLink } from '@angular/router';
 import { T } from '../../shared/nl';
 import { PublicLayoutComponent } from './public-layout.component';
 
+/** Rondleiding: one framed screenshot per app screen, with a short explanation. */
 @Component({
-  selector: 'app-landing',
+  selector: 'app-tour',
   imports: [RouterLink, MatIconModule, PublicLayoutComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './landing.component.html',
+  templateUrl: './tour.component.html',
 })
-export class LandingComponent {
+export class TourComponent {
   protected readonly t = T;
 }

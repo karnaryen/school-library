@@ -5,7 +5,6 @@
  */
 export const T = {
   appName: 'Biebouders',
-  tagline: 'De schoolbieb op je telefoon',
 
   nav: {
     borrow: 'Lenen',
@@ -22,47 +21,185 @@ export const T = {
     back: 'Terug',
   },
 
+  /** Header and footer links shared by the public pages. */
+  publicNav: {
+    tour: 'Rondleiding',
+    about: 'Over Biebouders',
+    privacy: 'Privacy',
+    toApp: 'Naar de bieb',
+    email: 'Mail ons: info@biebouders.nl',
+    openMenu: 'Menu openen',
+    closeMenu: 'Menu sluiten',
+  },
+
   landing: {
-    heroTitle: 'Een schoolbieb zonder scanner, printer of gedoe',
+    eyebrow: 'Voor de eigen boeken van de schoolbieb',
+    heroTitle: 'Weg met het papieren lijstje',
     heroText:
-      'Scan het ISBN op de achterkant met je telefoon. Lenen en inleveren in twee tikken. Voor leesouders, leerkrachten en leescoördinatoren van basisscholen.',
+      'Scan het ISBN met de camera van je telefoon of de schooltablet. Lenen en inleveren in twee tikken, ook voor de boeken die niet in het grote bibliotheeksysteem passen.',
+    heroNote: 'Geen installatie, geen scanner, geen accounts voor leerlingen.',
+    heroAlt: 'Een telefoon scant de streepjescode van een kinderboek. Ernaast ligt een papieren uitleenlijst.',
     cta: 'Gratis starten',
-    ctaSecondary: 'Bekijk de demo',
+    ctaSecondary: 'Bekijk de rondleiding',
+
+    problemTitle: 'Herken je dit?',
+    problemIntro:
+      'Naast de boeken van de bibliotheek heeft bijna elke basisschool een kast met eigen boeken: gekregen, gekocht van de ouderbijdrage of overgebleven van een project. Die hebben geen sticker van de bibliotheek en passen dus niet in het systeem.',
+    problems: [
+      {
+        title: 'Een lijstje op papier',
+        text: 'Titels in de ene kolom, namen in de andere. Doorstrepen bij inleveren, en na drie weken weet niemand meer wat er staat.',
+      },
+      {
+        title: 'Geen sticker, geen systeem',
+        text: 'Zonder chip of code van de bibliotheek kun je eigen boeken niet in het bibliotheeksysteem zetten. Ze blijven buiten beeld.',
+      },
+      {
+        title: 'Waar is dat boek?',
+        text: 'Aan het eind van het schooljaar mist er van alles en weet niemand wie het als laatste had.',
+      },
+    ],
+    problemAlt: 'Papieren uitleenlijst met doorgestreepte namen en een koffiekring.',
+
+    featuresTitle: 'Wat Biebouders doet',
+    featuresIntro: 'Elk boek heeft al een streepjescode op de achterkant: het ISBN. Meer heb je niet nodig.',
     features: [
       {
-        title: 'Geen apparatuur nodig',
-        text: 'Elk boek heeft al een barcode. Je telefoon of tablet leest hem. Geen etiketten plakken, geen scanner kopen.',
+        icon: 'photo_camera',
+        title: 'Scannen met de camera',
+        text: 'Richt de camera van je telefoon of tablet op de achterkant van het boek. Geen losse scanner, geen etiketten plakken.',
       },
       {
+        icon: 'auto_stories',
         title: 'Boekgegevens vanzelf',
-        text: 'Titel, auteur en omslag worden opgehaald zodra je scant. Alleen het AVI-niveau vul je zelf in als je wilt.',
+        text: 'Titel en auteur worden opgehaald zodra je scant. Het AVI-niveau vul je zelf in als je wilt.',
       },
       {
-        title: 'Alleen voornaam en groep',
-        text: 'Geen leerlingaccounts, geen geboortedata, geen BSN. Een verwerkersovereenkomst past op één pagina.',
+        icon: 'import_contacts',
+        title: 'Lenen in twee tikken',
+        text: 'Scan het boek en tik op de naam van het kind. Inleveren is zelfs één tik minder.',
       },
       {
-        title: 'Altijd overzicht',
-        text: 'Wie heeft wat, sinds wanneer, en wat is te laat. Per groep, per leerling, live op elk apparaat.',
+        icon: 'list_alt',
+        title: 'Overzicht per groep',
+        text: 'Wie heeft wat, sinds wanneer en wat is te laat. Live op elk apparaat, of afgedrukt voor in de klas.',
+      },
+      {
+        icon: 'groups',
+        title: 'Leerlingen in één keer',
+        text: 'Plak de leerlingenlijst uit ParnasSys, ESIS of Excel. Alleen voornaam en groep, meer bewaren we niet.',
+      },
+      {
+        icon: 'label',
+        title: 'Boek zonder barcode?',
+        text: 'Voor oude of zelfgemaakte boeken maak je een eigen code en druk je een etiket af.',
       },
     ],
+
     howTitle: 'Zo werkt het',
     how: [
-      'Maak een account en vul de naam van je school in.',
-      'Plak de leerlingenlijst uit ParnasSys, ESIS of Excel.',
-      'Scan je boeken. Tien seconden per boek, ook met meerdere ouders tegelijk.',
-      'Lenen: scan het boek, tik op de naam. Klaar.',
+      { title: 'Maak een account', text: 'Vul de naam van je school in. Collega’s sluiten aan met een toegangscode.' },
+      { title: 'Zet de leerlingen erin', text: 'Plak de lijst uit het leerlingvolgsysteem of typ ze in. Een paar minuten werk.' },
+      { title: 'Scan de boeken', text: 'Boek voor boek, tien seconden per stuk. Met meerdere ouders tegelijk gaat het nog sneller.' },
+      { title: 'Lenen en inleveren', text: 'Scan, tik op de naam, klaar. Het overzicht houdt zichzelf bij.' },
     ],
-    pricingTitle: 'Eén prijs, alles inbegrepen',
-    priceFree: 'Klassenbieb',
-    priceFreeAmount: 'Gratis',
-    priceFreeText: 'Tot 150 boeken. Voor één klas of om te proberen.',
-    priceSchool: 'Schoolbieb',
-    priceSchoolAmount: '€ 149 per jaar',
-    priceSchoolText: 'Onbeperkt boeken, locaties en medewerkers. De eerste drie maanden gratis.',
-    pricingNote: 'Geen btw (kleineondernemersregeling). Betaling op factuur. Je data kun je altijd exporteren.',
-    footerPrivacy: 'Privacy',
-    footerContact: 'Contact',
+
+    devicesTitle: 'Werkt op wat je al hebt',
+    devicesText:
+      'Biebouders is een website. Je opent hem op je eigen telefoon, op de schooltablet of op de laptop in de bieb. Niets installeren, niets kopen.',
+    devicesAlt: 'Een telefoon, een tablet en een laptop met dezelfde schoolbieb-app.',
+
+    fitTitle: 'Naast de grote bieb, niet in plaats van',
+    fitText:
+      'Werkt je school met de Bibliotheek op school of een ander uitleensysteem? Prima. Biebouders is er voor de boeken die daar niet in passen: de eigen kast van de school.',
+
+    trustTitle: 'Zuinig met gegevens',
+    trust: [
+      'Van leerlingen alleen de voornaam en de groep.',
+      'Geen accounts of wachtwoorden voor kinderen.',
+      'Gegevens staan in de Europese Unie en zijn altijd te exporteren.',
+    ],
+
+    ctaTitle: 'Klaar om het lijstje weg te gooien?',
+    ctaText: 'Maak een account, scan het eerste boek en zie hoe het werkt.',
+  },
+
+  about: {
+    title: 'Over Biebouders',
+    intro: 'Biebouders is ontstaan in een schoolbieb, niet op een kantoor.',
+    name: 'Natalia',
+    role: 'Frontend developer en biebouder',
+    photoAlt: 'Natalia, de maker van Biebouders',
+    story: [
+      'Ik ben Natalia. Als vrijwilliger help ik in de schoolbibliotheek van de basisschool van mijn dochter.',
+      'Het grootste deel van onze bieb draait op het systeem van de bibliotheek. Maar er staat ook een kast met eigen boeken van de school. Die hebben geen sticker van de bibliotheek, en die sticker kun je er niet zomaar bij laten maken. Ze passen dus niet in het systeem.',
+      'Daarom werkten we met een lijst op papier: de titel in de ene kolom, de naam van het kind in de andere. Doorstrepen bij inleveren. Dat werkt, tot het niet meer werkt.',
+      'Ik ben frontend developer van beroep. Op een dag dacht ik: elk boek heeft al een streepjescode, en iedereen heeft een telefoon met een camera. Zo ontstond Biebouders: scan het ISBN, kies het kind, klaar. Op je eigen telefoon of op de schooltablet.',
+      'Biebouders is gemaakt voor onze eigen bieb en staat nu open voor andere scholen. Loop je ergens tegenaan of heb je een idee? Ik hoor het graag.',
+    ],
+    portfolio: 'Meer over mijn werk',
+    portfolioUrl: 'https://karnaryen.com/',
+    contact: 'Stuur een e-mail',
+    cta: 'Bekijk de rondleiding',
+  },
+
+  tour: {
+    title: 'Rondleiding',
+    intro: 'Zo ziet Biebouders eruit als je bent ingelogd: vijf schermen, één balk bovenin, en de instellingen achter het tandwiel. Op een telefoon staan dezelfde knoppen, alleen wat dichter op elkaar.',
+    disclaimer:
+      'De school, de namen en de boeken op deze schermafbeeldingen zijn verzonnen. Het zijn voorbeeldgegevens, geen echte leerlingen.',
+    screens: [
+      {
+        id: 'lenen',
+        icon: 'import_contacts',
+        title: 'Lenen',
+        image: '/assets/images/demo/lenen.png',
+        alt: 'Het scherm Lenen met de knop Scan ISBN met camera en een veld om het ISBN te typen.',
+        text: 'Tik op Scan ISBN met camera en richt op de achterkant van het boek, of typ het ISBN. Daarna kies je de leerling uit de lijst, eventueel gefilterd op groep. Het boek staat meteen op naam, met de inleverdatum erbij.',
+      },
+      {
+        id: 'inleveren',
+        icon: 'assignment_return',
+        title: 'Inleveren',
+        image: '/assets/images/demo/inleveren.png',
+        alt: 'Het scherm Inleveren, met dezelfde scanknop en een knop Inleveren.',
+        text: 'Scan het boek dat terugkomt. Biebouders zoekt zelf op wie het had en zet het weer in de kast. Zijn er meerdere exemplaren van hetzelfde boek uitgeleend, dan kies je welk kind inlevert.',
+      },
+      {
+        id: 'overzicht',
+        icon: 'list_alt',
+        title: 'Overzicht',
+        image: '/assets/images/demo/overzicht.png',
+        alt: 'Het scherm Overzicht met een uitgeleend boek, de naam van de leerling en de inleverdatum.',
+        text: 'Alles wat uitgeleend is, per groep te filteren. Te laat staat in het rood. Inleveren kan ook direct vanuit dit scherm, en met de printknop druk je een lijst af voor in de klas.',
+      },
+      {
+        id: 'boeken',
+        icon: 'menu_book',
+        title: 'Boeken',
+        image: '/assets/images/demo/boeken.png',
+        alt: 'Het scherm Boeken met een zoekveld en een lijst titels met het aantal exemplaren.',
+        text: 'De hele kast in één lijst, met een zoekveld. Per titel zie je hoeveel exemplaren er zijn en hoeveel er in de kast staan. Een boek toevoegen gaat door te scannen; voor boeken zonder barcode druk je een eigen etiket af.',
+      },
+      {
+        id: 'leerlingen',
+        icon: 'groups',
+        title: 'Leerlingen',
+        image: '/assets/images/demo/leerlingen.png',
+        alt: 'Het scherm Leerlingen met de namen per groep en de knoppen Lijst importeren en Leerling toevoegen.',
+        text: 'Leerlingen staan per groep. Plak een lijst uit ParnasSys, ESIS of Excel, of voeg ze één voor één toe. Aan het eind van het schooljaar schuif je alle groepen in één keer door.',
+      },
+      {
+        id: 'instellingen',
+        icon: 'settings',
+        title: 'Instellingen',
+        image: '/assets/images/demo/instellingen.png',
+        alt: 'Het scherm Instellingen met de naam van de school, de uitleentermijn, de groepen, de toegangscode voor collega’s, exportknoppen en de knop Groepen doorschuiven.',
+        text: 'Naam van de school, uitleentermijn en groepen. Collega’s sluiten aan met de toegangscode. Alle gegevens zijn als CSV te downloaden, en bij een nieuw schooljaar schuif je alle groepen met één knop door.',
+      },
+    ],
+    ctaTitle: 'Zelf proberen?',
+    ctaText: 'Bij het aanmaken van een school kun je de bieb vullen met voorbeeldgegevens om rond te kijken.',
   },
 
   auth: {
@@ -264,11 +401,11 @@ export const T = {
     } as const,
     bannerTrial: (days: number) => (days === 1 ? 'De proefperiode eindigt morgen.' : `De proefperiode eindigt over ${days} dagen.`),
     bannerLocked: 'De bieb staat op alleen-lezen. Regel het abonnement bij Instellingen.',
-    price: '€ 149 per jaar, geen btw, betaling op factuur.',
+    price: 'Neem contact op om de mogelijkheden voor een grotere schoolbieb te bespreken.',
     request: 'Schoolbieb aanvragen',
     requestSubject: (school: string) => `Schoolbieb aanvragen voor ${school}`,
     requestBody: (school: string, count: number) =>
-      `Hallo,\n\nGraag een factuur voor het Schoolbieb-abonnement (€ 149 per jaar) voor ${school} (${count} boeken).\n\nFactuuradres:\n\nMet vriendelijke groet,`,
+      `Hallo,\n\nWij willen graag een Schoolbieb-abonnement voor ${school} (${count} boeken).\n\nMet vriendelijke groet,`,
     lockedTitle: 'Alleen-lezen',
     lockedText: 'Deze actie is niet beschikbaar zolang het abonnement niet is geregeld. Bekijken en inleveren kan wel.',
   },

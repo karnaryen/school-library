@@ -11,6 +11,16 @@ export const routes: Routes = [
     loadComponent: () => import('./features/public/landing.component').then((m) => m.LandingComponent),
   },
   {
+    path: 'rondleiding',
+    title: page(T.tour.title),
+    loadComponent: () => import('./features/public/tour.component').then((m) => m.TourComponent),
+  },
+  {
+    path: 'over',
+    title: page(T.about.title),
+    loadComponent: () => import('./features/public/about.component').then((m) => m.AboutComponent),
+  },
+  {
     path: 'privacy',
     title: page(T.privacy.title),
     loadComponent: () => import('./features/public/privacy.component').then((m) => m.PrivacyComponent),

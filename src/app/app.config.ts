@@ -1,5 +1,5 @@
 import { ApplicationConfig, InjectionToken, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { FirebaseApp, getApps, initializeApp } from 'firebase/app';
 import { Auth, connectAuthEmulator, getAuth } from 'firebase/auth';
 import { Firestore, connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
@@ -16,7 +16,7 @@ function firebaseApp(): FirebaseApp {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes, withComponentInputBinding()),
+    provideRouter(routes, withComponentInputBinding(), withInMemoryScrolling({ scrollPositionRestoration: 'top', anchorScrolling: 'enabled' })),
     // Plain Firebase SDK rather than @angular/fire, which lags behind Angular releases.
     {
       provide: FIREBASE_AUTH,

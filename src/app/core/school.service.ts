@@ -13,7 +13,7 @@ import {
 import { Subscription } from 'rxjs';
 import { makeInternalCode } from '../shared/isbn';
 import { JoinCode, Member, School, UserProfile, addDays, now, today } from '../shared/models';
-import { PlanInfo, TRIAL_DAYS, planInfo } from '../shared/plan';
+import { MONETIZATION_ENABLED, PlanInfo, TRIAL_DAYS, planInfo } from '../shared/plan';
 import { AuthService } from './auth.service';
 import { documentChanges } from './firestore.util';
 
@@ -43,10 +43,10 @@ export class SchoolService {
   readonly schoolId = computed(() => this.school()?.id ?? null);
   readonly isAdmin = computed(() => this.member()?.role === 'beheerder');
   readonly ready = computed(() => this.school() !== undefined);
-  /** Subscription status of the current school; `null` while no school is loaded. */
+  /** Subscription status of the current school; `null` while no school is loaded or while monetisation is off. */
   readonly plan = computed<PlanInfo | null>(() => {
     const school = this.school();
-    return school ? planInfo(school, today()) : null;
+    return school && MONETIZATION_ENABLED ? planInfo(school, today()) : null;
   });
   /** True when the school may not add books or lend (trial over and above the free tier). */
   readonly locked = computed(() => this.plan()?.locked ?? false);

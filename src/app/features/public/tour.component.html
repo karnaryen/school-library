@@ -1,0 +1,47 @@
+<app-public-layout>
+  <section class="public-section flex flex-col gap-8">
+    <div class="flex flex-col gap-4 max-w-2xl">
+      <p class="eyebrow">{{ t.appName }}</p>
+      <h1 class="section-title">{{ t.tour.title }}</h1>
+      <p class="section-lead">{{ t.tour.intro }}</p>
+    </div>
+
+    <p class="m-0 flex gap-3 items-start max-w-2xl rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 px-4 py-3">
+      <mat-icon class="shrink-0">info</mat-icon>
+      <span>{{ t.tour.disclaimer }}</span>
+    </p>
+
+    <nav class="flex flex-wrap gap-2" aria-label="Schermen">
+      @for (screen of t.tour.screens; track screen.id) {
+        <a routerLink="/rondleiding" [fragment]="screen.id" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 text-ink font-medium no-underline hover:border-brand hover:text-brand">
+          <mat-icon class="text-[20px]! w-5! h-5!">{{ screen.icon }}</mat-icon>{{ screen.title }}
+        </a>
+      }
+    </nav>
+  </section>
+
+  @for (screen of t.tour.screens; track screen.id; let odd = $odd) {
+    <section [id]="screen.id" class="scroll-mt-20" [class.bg-white]="odd" [class.border-y]="odd" [class.border-slate-200]="odd">
+      <div class="public-section grid md:grid-cols-[2fr_3fr] gap-8 md:gap-14 items-center">
+        <div class="flex flex-col gap-4" [class.md:order-last]="odd">
+          <span class="feature-icon"><mat-icon>{{ screen.icon }}</mat-icon></span>
+          <h2 class="m-0 text-3xl font-bold">{{ screen.title }}</h2>
+          <p class="m-0 text-lg text-slate-600">{{ screen.text }}</p>
+        </div>
+        <figure class="m-0 screen-frame">
+          <img [src]="screen.image" [alt]="screen.alt" width="1642" height="1158" loading="lazy">
+        </figure>
+      </div>
+    </section>
+  }
+
+  <section class="public-section">
+    <div class="rounded-3xl bg-brand text-white px-6 py-12 md:px-14 md:py-16 flex flex-col md:flex-row md:items-center gap-8">
+      <div class="flex flex-col gap-3 grow">
+        <h2 class="m-0 text-3xl md:text-4xl font-bold">{{ t.tour.ctaTitle }}</h2>
+        <p class="m-0 text-lg text-blue-100">{{ t.tour.ctaText }}</p>
+      </div>
+      <a routerLink="/registreren" class="btn-primary bg-sun text-ink hover:bg-amber-300 shrink-0">{{ t.landing.cta }}</a>
+    </div>
+  </section>
+</app-public-layout>
