@@ -23,7 +23,7 @@ const TRIAL_WARNING_DAYS = 14;
       <div class="min-h-screen flex flex-col">
         <header class="bg-white shadow-md z-20 md:sticky md:top-0">
           <div class="max-w-5xl mx-auto px-4 h-14 flex items-center gap-3">
-            <img src="/assets/images/logo4.png" alt="" class="h-9 w-9 rounded-xl">
+            <a routerLink="/" class="shrink-0" [attr.aria-label]="t.appName"><img src="/assets/images/logo4.png" alt="" class="block h-9 w-9 rounded-xl"></a>
             <span class="font-semibold truncate">{{ school.school()?.name }}</span>
             <span class="grow"></span>
             <a mat-icon-button routerLink="/app/instellingen" [attr.aria-label]="t.nav.settings"><mat-icon>settings</mat-icon></a>
