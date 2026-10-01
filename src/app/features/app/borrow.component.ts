@@ -11,6 +11,7 @@ import { SchoolService } from '../../core/school.service';
 import { LibraryError, LibraryService } from '../../services/library.service';
 import { SnackBarService } from '../../services/snack-bar.service';
 import { StudentsService } from '../../services/students.service';
+import { BookCoverComponent } from '../../shared/book-cover/book-cover.component';
 import { Student, Title, studentDisplayName } from '../../shared/models';
 import { T, formatDate } from '../../shared/nl';
 import { IsbnInputComponent } from './isbn-input.component';
@@ -19,6 +20,7 @@ import { LockedComponent } from './locked.component';
 @Component({
   selector: 'app-borrow',
   imports: [
+    BookCoverComponent,
     IsbnInputComponent,
     LockedComponent,
     FormsModule,

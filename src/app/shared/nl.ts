@@ -1,3 +1,5 @@
+import type { CoverImageErrorCode } from './cover-image';
+
 /**
  * All user-facing text, in Dutch. The customer is a leescoördinator or
  * leesouder at a basisschool, so Dutch is the only language for now; when a
@@ -336,6 +338,14 @@ export const T = {
     } as Record<string, string>,
     saved: 'Opgeslagen.',
     labels: 'Etiketten',
+    coverPhoto: 'Omslag fotograferen',
+    removeCoverPhoto: 'Omslagfoto verwijderen',
+    coverSaved: 'Omslagfoto opgeslagen.',
+    coverRemoved: 'Omslagfoto verwijderd.',
+    coverErrors: {
+      unreadable: 'Deze foto kan niet worden gelezen. Probeer het opnieuw.',
+      'too-large': 'Deze foto kan niet klein genoeg worden gemaakt. Probeer een andere foto.',
+    } satisfies Record<CoverImageErrorCode, string>,
   },
 
   addBook: {

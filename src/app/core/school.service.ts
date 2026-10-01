@@ -36,7 +36,7 @@ export class AccountError extends Error {
 }
 
 /** Everything under a school document, in the order it is wiped. */
-const SCHOOL_COLLECTIONS = ['loans', 'copies', 'titles', 'students'] as const;
+const SCHOOL_COLLECTIONS = ['loans', 'copies', 'covers', 'titles', 'students'] as const;
 
 const DEFAULT_GROUPS = ['1', '2', '3', '4', '5', '6', '7', '8'];
 const DEFAULT_LOAN_DAYS = 21;

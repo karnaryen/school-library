@@ -28,8 +28,8 @@
           <p class="m-0 text-sm" [class.text-amber-700]="existingCopies() > 0" [class.text-slate-600]="existingCopies() === 0">{{ message }}</p>
         }
         <div class="flex gap-4">
-          @if (coverUrl(); as cover) {
-            <img [src]="cover" alt="" class="w-20 self-start rounded-md shadow">
+          @if (cover(); as book) {
+            <app-book-cover class="w-20 self-start" [book]="book" />
           }
           <div class="grow flex flex-col">
             <mat-form-field class="input-field">

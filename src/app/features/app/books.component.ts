@@ -8,8 +8,11 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { RouterLink } from '@angular/router';
+import { CoversService } from '../../services/covers.service';
 import { LibraryService } from '../../services/library.service';
 import { SnackBarService } from '../../services/snack-bar.service';
+import { BookCoverComponent } from '../../shared/book-cover/book-cover.component';
+import { CoverImageError } from '../../shared/cover-image';
 import { Copy, Title } from '../../shared/models';
 import { T } from '../../shared/nl';
 
@@ -22,13 +25,17 @@ interface Row {
 
 @Component({
   selector: 'app-books',
-  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule, MatMenuModule, MatProgressSpinnerModule, RouterLink],
+  imports: [BookCoverComponent, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule, MatMenuModule, MatProgressSpinnerModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './books.component.html',
 })
 export class BooksComponent {
   private readonly library = inject(LibraryService);
+  private readonly covers = inject(CoversService);
   private readonly snackBar = inject(SnackBarService);
+
+  /** The book the photo picker was opened for. The list shares one picker, which cannot tell by itself. */
+  private coverPhotoFor: string | null = null;
 
   protected readonly t = T;
   protected readonly search = signal('');
@@ -75,13 +82,33 @@ export class BooksComponent {
     await this.run(row.title.isbn, () => this.library.setCopyStatus(copy, status));
   }
 
-  private async run(isbn: string, action: () => Promise<void>): Promise<void> {
+  /** Opens the camera (phone) or the file dialog (computer) for this book's cover. */
+  protected pickCoverPhoto(row: Row, picker: HTMLInputElement): void {
+    this.coverPhotoFor = row.title.isbn;
+    // Otherwise choosing the same file twice in a row would not count as a change.
+    picker.value = '';
+    picker.click();
+  }
+
+  protected async onCoverPhotoPicked(picker: HTMLInputElement): Promise<void> {
+    const isbn = this.coverPhotoFor;
+    const photo = picker.files?.[0];
+    this.coverPhotoFor = null;
+    if (!isbn || !photo) return;
+    await this.run(isbn, () => this.covers.setPhoto(isbn, photo), T.books.coverSaved);
+  }
+
+  protected async removeCoverPhoto(row: Row): Promise<void> {
+    await this.run(row.title.isbn, () => this.covers.removePhoto(row.title.isbn), T.books.coverRemoved);
+  }
+
+  private async run(isbn: string, action: () => Promise<void>, done: string = T.books.saved): Promise<void> {
     this.busy.set(isbn);
     try {
       await action();
-      this.snackBar.success(T.books.saved);
-    } catch {
-      this.snackBar.error(T.common.genericError);
+      this.snackBar.success(done);
+    } catch (err) {
+      this.snackBar.error(err instanceof CoverImageError ? T.books.coverErrors[err.code] : T.common.genericError);
     } finally {
       this.busy.set(null);
     }

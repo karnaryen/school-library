@@ -18,14 +18,12 @@
           <a mat-flat-button routerLink="/app/boeken/nieuw" [queryParams]="{ isbn: isbn() }">{{ t.borrow.addIt }}</a>
           <button mat-button type="button" (click)="reset()">{{ t.borrow.other }}</button>
         </div>
-      } @else {
+      } @else if (title(); as book) {
         <div class="flex gap-4 items-start">
-          @if (title()?.coverUrl; as cover) {
-            <img [src]="cover" alt="" class="w-16 rounded-md shadow">
-          }
+          <app-book-cover class="w-16" [book]="book" />
           <div class="grow">
-            <div class="text-lg font-semibold">{{ title()?.title }}</div>
-            <div class="text-slate-600">{{ title()?.author }}</div>
+            <div class="text-lg font-semibold">{{ book.title }}</div>
+            <div class="text-slate-600">{{ book.author }}</div>
             <div class="text-sm mt-1" [class.text-red-700]="available() === 0" [class.text-green-800]="available() > 0">
               {{ available() > 0 ? t.borrow.availableCopies(available()) : t.borrow.noCopy }}
             </div>

@@ -10,15 +10,16 @@ import { SchoolService } from '../../core/school.service';
 import { IsbnLookupService } from '../../services/isbn-lookup.service';
 import { LibraryService } from '../../services/library.service';
 import { SnackBarService } from '../../services/snack-bar.service';
+import { BookCoverComponent } from '../../shared/book-cover/book-cover.component';
 import { isInternalCode, toIsbn13 } from '../../shared/isbn';
-import { TitleDraft } from '../../shared/models';
+import { CoverSource, TitleDraft } from '../../shared/models';
 import { T } from '../../shared/nl';
 import { IsbnInputComponent } from './isbn-input.component';
 import { LockedComponent } from './locked.component';
 
 @Component({
   selector: 'app-add-book',
-  imports: [IsbnInputComponent, LockedComponent, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, RouterLink],
+  imports: [BookCoverComponent, IsbnInputComponent, LockedComponent, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './add-book.component.html',
 })
@@ -38,7 +39,8 @@ export class AddBookComponent {
   protected readonly busy = signal(false);
   protected readonly notice = signal<string | null>(null);
   protected readonly existingCopies = signal(0);
-  protected readonly coverUrl = signal<string | null>(null);
+  /** Set when there is a picture to show for the book; the form does without a placeholder. */
+  protected readonly cover = signal<CoverSource | null>(null);
   private draft: TitleDraft | null = null;
 
   protected readonly form = this.fb.group({
@@ -67,14 +69,14 @@ export class AddBookComponent {
       this.existingCopies.set(counts.total);
       if (existing) {
         this.draft = existing;
-        this.coverUrl.set(existing.coverUrl);
+        this.cover.set(pictured(existing));
         this.form.patchValue({ title: existing.title, author: existing.author, avi: existing.avi });
         this.notice.set(T.addBook.alreadyHave(counts.total));
         return;
       }
       const found = await this.lookup.lookup(isbn);
       this.draft = found;
-      this.coverUrl.set(found?.coverUrl ?? null);
+      this.cover.set(found ? pictured({ ...found, isbn }) : null);
       if (found) {
         this.form.patchValue({ title: found.title, author: found.author });
         this.notice.set(T.addBook.found);
@@ -133,8 +135,13 @@ export class AddBookComponent {
   protected reset(): void {
     this.current.set(null);
     this.notice.set(null);
-    this.coverUrl.set(null);
+    this.cover.set(null);
     this.draft = null;
     this.form.reset({ copies: 1 });
   }
+}
+
+/** The book as a cover source, or `null` when neither a lookup nor the school has a picture of it. */
+function pictured(book: CoverSource): CoverSource | null {
+  return book.coverUrl || book.coverPhotoAt ? book : null;
 }

@@ -7,6 +7,8 @@
  * the Firestore console and need no conversion in the UI.
  */
 
+import type { Bytes } from 'firebase/firestore';
+
 /**
  * Set by hand in the Firestore console; the app cannot change it.
  * 'trial' → full product until trialEndsAt; 'paid' → until paidUntil;
@@ -66,13 +68,40 @@ export interface Title {
   isbn: string;
   title: string;
   author: string;
+  /** Cover image the ISBN lookup found on the web; `null` when it found none. */
   coverUrl: string | null;
+  /**
+   * When the school last photographed the cover itself; absent or `null` when
+   * it never did. The picture is in `covers/{isbn}` and replaces `coverUrl`.
+   * A new photo is a new timestamp, so this is also what a cached picture is
+   * keyed on.
+   */
+  coverPhotoAt?: string | null;
   publisher: string;
   year: string;
   /** AVI level as printed on the book, e.g. "M4"; empty when unknown. */
   avi: string;
   source: TitleSource;
   createdAt: string;
+}
+
+/** The part of a title that decides which cover is shown for it. */
+export type CoverSource = Pick<Title, 'isbn' | 'title' | 'coverUrl' | 'coverPhotoAt'>;
+
+/**
+ * `schools/{id}/covers/{isbn}`: the school's own photo of a cover, shrunk to a
+ * thumbnail of a few kilobytes (see shared/cover-image.ts).
+ *
+ * Kept out of the title document on purpose. Every screen with a book list
+ * listens to all titles at once, so pictures stored there would be downloaded
+ * for the whole library on every visit; here only the covers that scroll into
+ * view are read.
+ */
+export interface CoverPhoto {
+  image: Bytes;
+  contentType: string;
+  /** Equal to the title's `coverPhotoAt`. */
+  updatedAt: string;
 }
 
 export type CopyStatus = 'available' | 'onLoan' | 'lost' | 'removed';

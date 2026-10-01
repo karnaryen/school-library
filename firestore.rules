@@ -81,6 +81,19 @@ service cloud.firestore {
       match /titles/{isbn} {
         allow read, write: if isMember(sid);
       }
+      // A school's own cover photos. Every field is typed and bounded, so a
+      // cover document cannot grow beyond a thumbnail. Keep the size in step
+      // with COVER_MAX_BYTES in src/app/shared/cover-image.ts.
+      match /covers/{isbn} {
+        allow read, delete: if isMember(sid);
+        allow create, update: if isMember(sid)
+          && request.resource.data.keys().hasOnly(['image', 'contentType', 'updatedAt'])
+          && request.resource.data.image is bytes
+          && request.resource.data.image.size() <= 32 * 1024
+          && request.resource.data.contentType in ['image/webp', 'image/jpeg']
+          && request.resource.data.updatedAt is string
+          && request.resource.data.updatedAt.size() <= 40;
+      }
       match /copies/{id} {
         allow read, write: if isMember(sid);
       }

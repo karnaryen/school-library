@@ -26,6 +26,9 @@
     }
   </div>
 
+  <!-- One picker for the whole list, opened from a row's menu. On a phone `capture` goes straight to the camera. -->
+  <input #coverInput type="file" accept="image/*" capture="environment" class="sr-only" tabindex="-1" aria-hidden="true" (change)="onCoverPhotoPicked(coverInput)">
+
   @if (!loaded()) {
     <div class="flex justify-center py-10"><mat-spinner /></div>
   } @else if (rows().length === 0) {
@@ -36,11 +39,7 @@
     <div class="flex flex-col gap-2">
       @for (row of visible(); track row.title.isbn) {
         <div class="card py-3! flex items-center gap-3">
-          @if (row.title.coverUrl; as cover) {
-            <img [src]="cover" alt="" class="w-10 rounded shadow-sm shrink-0">
-          } @else {
-            <div class="w-10 h-14 rounded bg-slate-100 shrink-0"></div>
-          }
+          <app-book-cover class="w-10" [book]="row.title" />
           <div class="grow min-w-0">
             <div class="font-medium truncate">{{ row.title.title }}</div>
             <div class="text-sm text-slate-600 truncate">{{ row.title.author }}@if (row.title.avi) { · AVI {{ row.title.avi }}}</div>
@@ -56,6 +55,10 @@
             <button mat-menu-item type="button" (click)="addCopy(row)"><mat-icon>add</mat-icon>{{ t.books.addCopy }}</button>
             <button mat-menu-item type="button" (click)="markCopy(row, 'lost')" [disabled]="row.available === 0"><mat-icon>help_outline</mat-icon>{{ t.books.markLost }}</button>
             <button mat-menu-item type="button" (click)="markCopy(row, 'removed')" [disabled]="row.total === 0"><mat-icon>delete_outline</mat-icon>{{ t.books.markRemoved }}</button>
+            <button mat-menu-item type="button" (click)="pickCoverPhoto(row, coverInput)"><mat-icon>photo_camera</mat-icon>{{ t.books.coverPhoto }}</button>
+            @if (row.title.coverPhotoAt) {
+              <button mat-menu-item type="button" (click)="removeCoverPhoto(row)"><mat-icon>hide_image</mat-icon>{{ t.books.removeCoverPhoto }}</button>
+            }
           </mat-menu>
         </div>
       }

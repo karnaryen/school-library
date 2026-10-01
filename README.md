@@ -91,6 +91,28 @@ The security rules allow `delete` on `schools/{sid}` for a beheerder and on a
 member's own document; redeploy them after pulling this change:
 `firebase deploy --only firestore:rules`.
 
+## Covers
+
+A book shows, in this order: the school's own photo of the cover, the picture
+the ISBN lookup found (`coverUrl`), or a coloured tile with the first letter of
+the title. All three go through `BookCoverComponent`.
+
+Boeken → ⋮ → "Omslag fotograferen" opens the camera on a phone and a file
+dialog on a computer. The photo is shrunk in the browser to at most 200 × 300
+pixels and 32 kB (`shared/cover-image.ts`; about 10 kB in practice) and stored
+in `covers/{isbn}`; the title only records when (`coverPhotoAt`). Pictures are
+not kept in the title documents because every book list listens to all titles
+at once. A cover is read when it scrolls into view, so it costs one document
+read per cover actually looked at.
+
+Firestore rather than Cloud Storage because Storage needs the Blaze plan. At
+10 kB a cover, a thousand photographed books take about 10 MB of the 1 GiB
+free quota.
+
+The security rules cap the size and the index file keeps the image bytes out
+of the indexes; redeploy both after pulling this change:
+`firebase deploy --only firestore`.
+
 ## Books without a barcode
 
 Boek toevoegen → "Geen barcode?" reserves a school-internal EAN-13 code
@@ -102,13 +124,14 @@ Etiketten prints them on 3 × 8 label sheets (Avery L7160).
 ```
 src/app/
   core/         AuthService, SchoolService (current tenant), auth guard, Firestore helpers
-  services/     StudentsService, LibraryService (titles, copies, loans), IsbnLookupService
+  services/     StudentsService, LibraryService (titles, copies, loans), CoversService (cover photos),
+                IsbnLookupService
   features/
     public/     landing, rondleiding, over, privacy, login, register (shared PublicLayoutComponent)
     app/        shell + onboarding, uitlenen, innemen, overzicht, boeken (+ nieuw, etiketten),
                 leerlingen, instellingen (abonnement, export, team, nieuw schooljaar)
   shared/       models, ISBN helpers, CSV parser, Dutch UI strings (nl.ts),
-                camera ScannerComponent, ConfirmDialogComponent
+                camera ScannerComponent, BookCoverComponent, ConfirmDialogComponent
 firestore.rules  tenant isolation: only members of a school can read or write its data
 ```
 
@@ -123,7 +146,8 @@ schools/{id}                name, plan, trialEndsAt, paidUntil, copyCount, nextI
                             loanDays, groups[], joinCode, createdBy
   members/{uid}             role: beheerder | medewerker
   students/{id}             firstName, lastName, group, active
-  titles/{isbn}             title, author, coverUrl, avi, source
+  titles/{isbn}             title, author, coverUrl, coverPhotoAt, avi, source
+  covers/{isbn}             image (bytes), contentType, updatedAt
   copies/{id}               isbn, location, status: available | onLoan | lost | removed
   loans/{id}                copyId, isbn, title, studentId, studentName, group,
                             borrowedAt, dueAt, returnedAt (null while out)
