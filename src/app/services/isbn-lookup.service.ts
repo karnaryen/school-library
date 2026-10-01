@@ -42,21 +42,43 @@ export class IsbnLookupService {
     }
   }
 
+  /**
+   * Two requests, because neither answers alone. The search index is asked
+   * first: it answers 200 with zero hits for an unknown ISBN, so a miss — the
+   * common case — is not a failed request, and it carries the author names.
+   * It only knows the work, though, and a work's title is the original one,
+   * not the translation's. The edition record supplies the title on the
+   * cover, with its publisher, year and cover image.
+   *
+   * The legacy `/api/books?bibkeys=` endpoint did both in one request, until
+   * it started answering 404 for every ISBN.
+   */
   private async openLibrary(isbn: string): Promise<TitleDraft | null> {
     try {
-      const res = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);
+      const res = await fetch(`https://openlibrary.org/search.json?isbn=${isbn}&fields=title,author_name&limit=1`);
       if (!res.ok) return null;
-      const data = (await res.json()) as Record<string, OpenLibraryBook>;
-      const book = data[`ISBN:${isbn}`];
-      if (!book?.title) return null;
+      const work = ((await res.json()) as OpenLibrarySearch).docs?.[0];
+      if (!work?.title) return null;
+      const edition = await this.openLibraryEdition(isbn);
+      const cover = edition?.covers?.find((id) => id > 0);
       return {
-        title: book.title,
-        author: (book.authors ?? []).map((a) => a.name).join(', '),
-        coverUrl: book.cover?.medium ?? null,
-        publisher: (book.publishers ?? []).map((p) => p.name).join(', '),
-        year: (book.publish_date ?? '').match(/\d{4}/)?.[0] ?? '',
+        title: edition?.title ?? work.title,
+        author: (work.author_name ?? []).join(', '),
+        coverUrl: cover ? `https://covers.openlibrary.org/b/id/${cover}-M.jpg` : null,
+        publisher: (edition?.publishers ?? []).join(', '),
+        year: (edition?.publish_date ?? '').match(/\d{4}/)?.[0] ?? '',
         source: 'openlibrary',
       };
+    } catch {
+      return null;
+    }
+  }
+
+  /** Optional detail: a failure here still leaves the work's title and author. */
+  private async openLibraryEdition(isbn: string): Promise<OpenLibraryEdition | null> {
+    try {
+      const res = await fetch(`https://openlibrary.org/isbn/${isbn}.json`);
+      return res.ok ? ((await res.json()) as OpenLibraryEdition) : null;
     } catch {
       return null;
     }
@@ -75,10 +97,13 @@ interface GoogleVolumes {
   }[];
 }
 
-interface OpenLibraryBook {
+interface OpenLibrarySearch {
+  docs?: { title?: string; author_name?: string[] }[];
+}
+
+interface OpenLibraryEdition {
   title?: string;
-  authors?: { name: string }[];
-  publishers?: { name: string }[];
+  publishers?: string[];
   publish_date?: string;
-  cover?: { medium?: string };
+  covers?: number[];
 }
